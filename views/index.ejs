@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <title>Pay Slip Generate</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+            .main-div{
+                text-align: center;
+                border: 1px solid #000;
+                width: 200px;
+                padding: 20px;
+                margin: 0 auto;
+            }
+            .input-div {
+                margin: 10px;
+            }
+            .response-div{
+                text-align: center;
+                padding: 20px;
+                margin: 0 auto;
+            }
+            .input-div input,.input-div select{
+                width: 100%;
+                padding: 5px;
+            }
+            table{
+                text-align: center;
+                margin: 0 auto;
+                border-collapse: collapse;
+            }
+            th,td{
+                border: 1px solid #000;
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main-div">
+            <h3>Pay Slip Generate</h3>
+            <form action="generate_slip" method="POST">
+                <div class="input-div">
+                    <input type="text" name="firstName" placeholder="First Name">
+                </div>
+                <div class="input-div">
+                    <input type="text" name="lastName" placeholder="Last Name">
+                </div>
+                <div class="input-div">
+                    <input type="text" name="annualSalary" placeholder="Annual Salary">
+                </div>
+                <div class="input-div">
+                    <select name="superRate">
+                        <option value="">Select Super Rate</option>
+                        <% for(var i=0;i<=12;i++) { %>
+                        <option value="<%- i %>"><%- i %>%</option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="input-div">
+                    <select name="paymentDate">
+                        <option value="">Select Payment Month</option>
+                        <% month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; for(var i=0;i<=11;i++) { %>
+                        <option value="<%- month[i] %>"><%- month[i] %>, 2017</option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="input-div">
+                    <input type="submit" name="submit" value="Generate">
+                </div>
+            </form>
+        </div>
+        <div class="response-div">
+            <!-- Data come from JS -->
+        </div>
+        <script>
+            $("form").submit(function(e) {
+                $('.response-div').html('');
+                e.preventDefault();
+                var actionurl = e.currentTarget.action;
+                $.ajax({
+                    url: actionurl,
+                    type: 'post',
+                    data: $("form").serialize(),
+                    beforeSend:function(){
+                        //alert('WIP');
+                    },
+                    success: function(data) {
+                        if(data.code == 200){
+                            var htm = '';
+                            htm = '<table><thead><tr><th>Name</th><th>Pay Period</th><th>Gross Income</th><th>Income Tax</th><th>Net Income</th><th>Super Amount</th></tr></thead><tbody><tr><td>'+data.data.name+'</td><td>'+data.data.payPeriod+'</td><td>'+data.data.grossIncome+'</td><td>'+data.data.incomeTax+'</td><td>'+data.data.netIncome+'</td><td>'+data.data.super+'</td></tr></tbody></table>';
+                            $('.response-div').html(htm);
+                        }else{
+                            alert(data.message);
+                        }
+                    },
+                    error:function(err){
+                        alert('Try Again!');
+                    }
+                });
+            })
+        </script>
+    </body>
+</html>
